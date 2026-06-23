@@ -412,5 +412,30 @@
   document.getElementById("chatModal").addEventListener("click", e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove("open"); });
   document.getElementById("modalReset").addEventListener("click", e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove("open"); });
 </script>
+<style>
+@media(max-width:768px){
+  .top-bar{padding:10px 14px;flex-wrap:wrap;gap:8px;}
+  .breadcrumb{display:none;}
+  .top-actions{margin-left:0;gap:6px;}
+  .btn-back,.btn-logout{font-size:0.78rem;padding:6px 10px;}
+
+  .content{padding:14px;}
+
+  .profile-hero{flex-direction:column;align-items:flex-start;gap:14px;padding:18px;}
+  .profile-av{width:56px;height:56px;font-size:22px;}
+  .profile-info h2{font-size:1.1rem;}
+  .profile-stats{margin-left:0;gap:12px;}
+  .pstat-val{font-size:1.3rem;}
+  .hero-actions{margin-left:0;flex-direction:row;flex-wrap:wrap;align-items:flex-start;width:100%;}
+  .btn-reset,.btn-download-pdf{font-size:0.78rem;padding:6px 12px;}
+
+  .grid{grid-template-columns:1fr;}
+
+  .chat-modal{width:94vw;max-height:80vh;}
+  .reset-modal{width:90vw;padding:20px;}
+
+  .s-actions{flex-wrap:wrap;gap:4px;}
+}
+</style>
 </body>
 </html>
