@@ -172,12 +172,59 @@
     .btn-esc-read:hover{background:rgba(251,191,36,0.22);border-color:rgba(251,191,36,0.45);}
     .esc-link{color:inherit;text-decoration:none;}
     .esc-link:hover .esc-name{color:var(--teal);}
+
+    /* ── HAMBURGER (mobile) ─────────────── */
+    .menu-toggle{display:none;background:none;border:none;color:var(--white);font-size:22px;cursor:pointer;padding:4px 8px;border-radius:8px;}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:40;}
+    .sidebar-overlay.open{display:block;}
+
+    /* ── MOBILE RESPONSIVE ───────────────── */
+    @media(max-width:768px){
+      body{flex-direction:column;overflow:auto;}
+
+      .sidebar{
+        position:fixed;top:0;left:0;
+        height:100vh;width:80vw;max-width:280px;
+        transform:translateX(-100%);
+        transition:transform 0.28s cubic-bezier(0.22,1,0.36,1);
+        z-index:50;
+      }
+      .sidebar.open{transform:translateX(0);}
+
+      .main{width:100%;height:auto;overflow:visible;}
+      .menu-toggle{display:flex;align-items:center;}
+
+      .top-bar{padding:12px 14px;flex-wrap:wrap;gap:10px;}
+      .top-bar h1{font-size:0.97rem;}
+      .top-actions{flex-wrap:wrap;gap:6px;}
+      .btn-action{font-size:0.78rem;padding:7px 10px;}
+
+      .content{padding:14px;}
+
+      .stats-grid{grid-template-columns:1fr 1fr;gap:10px;}
+      .stats-grid .stat-card:last-child{grid-column:1/-1;}
+      .stat-value{font-size:1.6rem;}
+
+      .angkatan-grid{grid-template-columns:1fr;}
+
+      .two-col{grid-template-columns:1fr;}
+
+      .escalation-banner{margin:0 0 14px;}
+
+      table thead th:nth-child(3),
+      table thead th:nth-child(4),
+      table tbody td:nth-child(3),
+      table tbody td:nth-child(4){display:none;}
+
+      .modal{width:92vw;padding:20px;}
+    }
   </style>
 </head>
 <body>
 
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <!-- SIDEBAR -->
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
   <div class="sb-header">
     <div class="logo-row">
       <div class="logo-icon">🧠</div>
@@ -220,6 +267,7 @@
 <!-- MAIN -->
 <div class="main">
   <div class="top-bar">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Buka menu">☰</button>
     <div>
       <h1>
         {% if role == 'superadmin' %}Dashboard Super Admin{% else %}Dashboard Guru BK — Kelas {{ angkatan }}{% endif %}
@@ -394,6 +442,11 @@
 </div>
 
 <script>
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
+    document.getElementById("sidebarOverlay").classList.toggle("open");
+  }
+
   // Preview password otomatis saat kelas dipilih
   function previewPassword() {
     const kelas = document.getElementById("newKelas").value;
