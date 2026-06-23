@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindPal — Detail Siswa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--teal:#2DD4BF;--teal-dark:#0D9488;--navy:#0F172A;--navy-mid:#1E293B;--navy-light:#334155;--slate:#64748B;--white:#F8FAFC;--muted:#94A3B8;}
+    html,body{min-height:100%;}
+    body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);display:flex;flex-direction:column;}
+
+    .top-bar{padding:14px 28px;background:var(--navy-mid);border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:16px;flex-shrink:0;}
+    .logo-row{display:flex;align-items:center;gap:8px;text-decoration:none;}
+    .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+    .logo-text{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--white);}
+    .logo-text span{color:var(--teal);}
+    .breadcrumb{font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:6px;}
+    .breadcrumb a{color:var(--muted);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--teal);}
+    .breadcrumb .sep{color:var(--slate);}
+    .top-actions{margin-left:auto;display:flex;gap:10px;}
+    .btn-back{padding:7px 14px;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);border-radius:9px;text-decoration:none;font-size:0.82rem;transition:all .2s;}
+    .btn-back:hover{background:rgba(255,255,255,0.1);color:var(--white);}
+    .btn-logout{padding:7px 14px;background:rgba(248,113,113,0.1);color:#F87171;border:1px solid rgba(248,113,113,0.2);border-radius:9px;text-decoration:none;font-size:0.82rem;}
+    .btn-logout:hover{background:rgba(248,113,113,0.2);}
+
+    .content{flex:1;overflow-y:auto;padding:28px;max-width:1100px;margin:0 auto;width:100%;}
+    .content::-webkit-scrollbar{width:5px;}
+    .content::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:4px;}
+
+    /* Profile hero */
+    .profile-hero{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:22px;position:relative;overflow:hidden;}
+    .profile-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),#818CF8,var(--teal-dark));}
+    .profile-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#818CF8,#6366F1);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;box-shadow:0 0 24px rgba(129,140,248,0.3);}
+    .profile-info h2{font-family:'Sora',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:8px;}
+    .profile-meta{display:flex;gap:8px;flex-wrap:wrap;}
+    .meta-pill{display:flex;align-items:center;gap:5px;padding:4px 12px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.15);border-radius:20px;font-size:0.78rem;color:var(--teal);}
+    .profile-stats{margin-left:auto;display:flex;gap:16px;}
+    .pstat{text-align:center;}
+    .pstat-val{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;color:var(--teal);}
+    .pstat-lab{font-size:0.72rem;color:var(--muted);margin-top:2px;}
+
+    /* Action buttons in hero */
+    .hero-actions{margin-left:auto;display:flex;flex-direction:column;gap:8px;align-items:flex-end;}
+    .btn-reset{padding:7px 14px;background:rgba(251,191,36,0.1);color:#FCD34D;border:1px solid rgba(251,191,36,0.2);border-radius:9px;font-size:0.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;}
+    .btn-reset:hover{background:rgba(251,191,36,0.2);}
+
+    /* === BARU: Tombol Download PDF === */
+    .btn-download-pdf{
+      padding:7px 16px;
+      background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+      color:var(--navy);
+      border:none;
+      border-radius:9px;
+      font-size:0.82rem;
+      font-weight:700;
+      font-family:'Sora',sans-serif;
+      cursor:pointer;
+      display:flex;align-items:center;gap:6px;
+      transition:opacity .2s, transform .15s;
+      text-decoration:none;
+    }
+    .btn-download-pdf:hover{opacity:0.88;transform:translateY(-1px);}
+    .btn-download-pdf:active{transform:translateY(0);opacity:0.75;}
+
+    .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;}
+    .card{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;}
+    .card-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);font-family:'Sora',sans-serif;font-size:0.92rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+    .card-body{padding:16px 20px;}
+
+    .session-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+    .session-row:last-child{border-bottom:none;}
+    .s-bullet{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px;}
+    .s-title{font-size:0.87rem;font-weight:500;margin-bottom:3px;transition:color .2s;}
+    .s-meta{font-size:0.74rem;color:var(--muted);}
+    .s-actions{display:flex;gap:6px;margin-left:auto;flex-shrink:0;align-items:center;}
+    .s-badge{padding:2px 8px;background:rgba(45,212,191,0.1);color:var(--teal);border-radius:6px;font-size:0.72rem;border:1px solid rgba(45,212,191,0.2);cursor:pointer;transition:background .2s;}
+    .s-badge:hover{background:rgba(45,212,191,0.2);}
+
+    /* === BARU: Tombol ringkasan per sesi === */
+    .btn-summarize{
+      padding:2px 8px;
+      background:rgba(129,140,248,0.1);
+      color:#A5B4FC;
+      border:1px solid rgba(129,140,248,0.2);
+      border-radius:6px;
+      font-size:0.72rem;
+      cursor:pointer;
+      font-family:'Inter',sans-serif;
+      transition:background .2s;
+      white-space:nowrap;
+    }
+    .btn-summarize:hover{background:rgba(129,140,248,0.22);}
+    .btn-summarize:disabled{opacity:0.5;cursor:not-allowed;}
+
+    /* === BARU: Box ringkasan AI === */
+    .summary-box{
+      margin-top:8px;
+      padding:10px 13px;
+      background:rgba(129,140,248,0.07);
+      border:1px solid rgba(129,140,248,0.18);
+      border-radius:9px;
+      font-size:0.82rem;
+      color:var(--muted);
+      line-height:1.7;
+      display:none;
+    }
+    .summary-box.show{display:block;}
+    .summary-box .summary-label{font-size:0.7rem;font-weight:600;color:#A5B4FC;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:5px;}
+    .summary-text{color:var(--white);}
+
+    .note-item{padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:10px;font-size:0.85rem;line-height:1.6;}
+    .note-date{font-size:0.72rem;color:var(--muted);margin-top:6px;}
+    .note-empty{font-size:0.84rem;color:var(--muted);text-align:center;padding:16px;}
+
+    .note-form textarea{width:100%;padding:10px 13px;background:var(--navy);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:var(--white);font-family:'Inter',sans-serif;font-size:0.87rem;resize:vertical;min-height:80px;outline:none;margin-bottom:10px;}
+    .note-form textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(45,212,191,0.1);}
+    .btn-note{padding:8px 18px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));color:var(--navy);font-family:'Sora',sans-serif;font-weight:600;font-size:0.83rem;border:none;border-radius:9px;cursor:pointer;transition:opacity .2s;}
+    .btn-note:hover{opacity:0.85;}
+    .note-status{font-size:0.78rem;margin-left:10px;}
+    .note-ok{color:var(--teal);}
+    .note-err{color:#F87171;}
+
+    /* Chat modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;}
+    .modal-overlay.open{display:flex;}
+    .chat-modal{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:540px;max-height:75vh;display:flex;flex-direction:column;animation:popIn .25s ease;}
+    @keyframes popIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+    .modal-head{padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.06);font-family:'Sora',sans-serif;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
+    .modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+    .modal-close:hover{color:var(--white);}
+    .modal-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+    .modal-body::-webkit-scrollbar{width:4px;}
+    .modal-body::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:4px;}
+    .chat-msg{max-width:80%;}
+    .chat-msg.user{align-self:flex-end;}
+    .chat-msg.ai{align-self:flex-start;}
+    .chat-bubble{padding:10px 14px;border-radius:14px;font-size:0.85rem;line-height:1.6;}
+    .chat-msg.user .chat-bubble{background:linear-gradient(135deg,var(--teal-dark),#0F766E);color:white;border-top-right-radius:4px;}
+    .chat-msg.ai .chat-bubble{background:var(--navy);border:1px solid rgba(255,255,255,0.07);border-top-left-radius:4px;}
+    .chat-time{font-size:0.68rem;color:var(--muted);margin-top:3px;}
+    .chat-msg.user .chat-time{text-align:right;}
+    .empty-chat{text-align:center;color:var(--muted);font-size:0.82rem;padding:20px;}
+
+    /* Reset password modal */
+    .reset-modal{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;width:360px;animation:popIn .25s ease;}
+    .reset-modal h3{font-family:'Sora',sans-serif;font-size:1rem;font-weight:600;margin-bottom:12px;}
+    .reset-result{margin-top:14px;padding:12px 14px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.2);border-radius:10px;font-size:0.85rem;color:var(--teal);display:none;}
+    .btn-confirm{width:100%;padding:11px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));color:var(--navy);font-family:'Sora',sans-serif;font-weight:700;font-size:0.9rem;border:none;border-radius:10px;cursor:pointer;margin-top:14px;}
+    .btn-close-modal{width:100%;padding:9px;background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid rgba(255,255,255,0.1);border-radius:10px;cursor:pointer;font-size:0.87rem;margin-top:8px;}
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/admin" class="logo-row">
+    <div class="logo-icon">🧠</div>
+    <div class="logo-text">Mind<span>Pal</span></div>
+  </a>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="/admin">Dashboard</a>
+    <span class="sep">›</span>
+    <span class="current">{{ student['name'] }}</span>
+  </div>
+  <div class="top-actions">
+    <a href="/admin" class="btn-back">← Kembali</a>
+    <a href="/logout" class="btn-logout">Keluar</a>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- Profile hero -->
+  <div class="profile-hero">
+    <div class="profile-av">{{ student['name'][0] }}</div>
+    <div class="profile-info">
+      <h2>{{ student['name'] }}</h2>
+      <div class="profile-meta">
+        <div class="meta-pill">📚 Kelas {{ student['kelas'] }}</div>
+        <div class="meta-pill">🪪 NISN: {{ student['nisn'] }}</div>
+        <div class="meta-pill">📅 Terdaftar {{ student['created_at'][:10] }}</div>
+        {% if student_escalations %}
+        <div class="meta-pill" style="background:rgba(251,191,36,0.1);border-color:rgba(251,191,36,0.2);color:#FCD34D;">
+          🙋 {{ student_escalations|length }}x minta konselor
+          {% set unread = student_escalations|selectattr('is_read','equalto',0)|list %}
+          {% if unread %}
+          <span style="font-size:0.68rem;background:#FCD34D;color:#0F172A;border-radius:99px;padding:1px 6px;margin-left:4px;font-weight:700;">{{ unread|length }} baru</span>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="hero-actions">
+      <div style="display:flex;gap:16px;">
+        <div class="pstat"><div class="pstat-val">{{ sessions|length }}</div><div class="pstat-lab">Total Sesi</div></div>
+        <div class="pstat"><div class="pstat-val">{{ notes|length }}</div><div class="pstat-lab">Catatan</div></div>
+      </div>
+      <!-- BARU: Download PDF -->
+      <a href="/admin/student/{{ student['id'] }}/download-pdf" class="btn-download-pdf" title="Download semua percakapan sebagai PDF untuk laporan ke orang tua">
+        📄 Download Laporan PDF
+      </a>
+      <button class="btn-reset" onclick="document.getElementById('modalReset').classList.add('open')">
+        🔑 Reset Password
+      </button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Sesi -->
+    <div class="card">
+      <div class="card-header">💬 Riwayat Sesi Konseling</div>
+      <div class="card-body">
+        {% if sessions %}
+          {% for s in sessions %}
+          <div class="session-row">
+            <div class="s-bullet"></div>
+            <div style="flex:1;min-width:0">
+              <div class="s-title">{{ s.topic }}</div>
+              <div class="s-meta">{{ s.started_at[:16].replace('T',' ') }} · {{ s.msg_count }} pesan</div>
+              <!-- BARU: Box ringkasan AI, tersembunyi sampai digenerate -->
+              <div class="summary-box" id="summary-{{ s.id }}">
+                <div class="summary-label">🤖 Ringkasan AI</div>
+                <div class="summary-text" id="summary-text-{{ s.id }}"></div>
+              </div>
+            </div>
+            <div class="s-actions">
+              <!-- BARU: Tombol Generate Ringkasan -->
+              <button class="btn-summarize" id="btn-sum-{{ s.id }}"
+                onclick="generateSummary({{ s.id }}, {{ s.msg_count }}, this)"
+                {% if s.msg_count == 0 %}disabled title="Belum ada pesan"{% endif %}>
+                ✨ Ringkasan
+              </button>
+              <div class="s-badge" onclick="viewSession({{ s.id }}, '{{ s.topic }}')">Lihat</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="note-empty">Siswa belum memiliki sesi konseling.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Catatan -->
+    <div class="card">
+      <div class="card-header">📝 Catatan Konselor</div>
+      <div class="card-body">
+        <div class="note-form">
+          <textarea id="noteInput" placeholder="Tulis catatan perkembangan, tindak lanjut, atau observasi..."></textarea>
+          <div style="display:flex;align-items:center;">
+            <button class="btn-note" onclick="saveNote()">Simpan Catatan</button>
+            <span class="note-status" id="noteStatus"></span>
+          </div>
+        </div>
+        <div style="margin-top:16px" id="notesList">
+          {% if notes %}
+            {% for n in notes %}
+            <div class="note-item">
+              {{ n['note'] }}
+              <div class="note-date">{{ n['created_at'][:16].replace('T',' ') }} · {{ n['counselor_name'] }}</div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="note-empty">Belum ada catatan untuk siswa ini.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: lihat percakapan -->
+<div class="modal-overlay" id="chatModal">
+  <div class="chat-modal">
+    <div class="modal-head">
+      <span id="modalTitle">Percakapan</span>
+      <button class="modal-close" onclick="document.getElementById('chatModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <div class="empty-chat">Memuat...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: reset password -->
+<div class="modal-overlay" id="modalReset">
+  <div class="reset-modal">
+    <h3>🔑 Reset Password Siswa</h3>
+    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;">
+      Password akan direset ke default berdasarkan kelas siswa ini.<br/>
+      Kelas <strong style="color:var(--white)">{{ student['kelas'] }}</strong> →
+      password baru akan ditampilkan setelah konfirmasi.
+    </p>
+    <div class="reset-result" id="resetResult"></div>
+    <button class="btn-confirm" id="btnConfirmReset" onclick="doReset()">Konfirmasi Reset</button>
+    <button class="btn-close-modal" onclick="document.getElementById('modalReset').classList.remove('open')">Batal</button>
+  </div>
+</div>
+
+<script>
+  const STUDENT_ID = {{ student['id'] }};
+
+  async function viewSession(sessionId, topic) {
+    document.getElementById("modalTitle").textContent = topic;
+    document.getElementById("chatModal").classList.add("open");
+    const body = document.getElementById("modalBody");
+    body.innerHTML = '<div class="empty-chat">Memuat percakapan...</div>';
+
+    const res  = await fetch(`/admin/student/${STUDENT_ID}/session/${sessionId}`);
+    const msgs = await res.json();
+
+    if (!msgs.length) { body.innerHTML = '<div class="empty-chat">Belum ada pesan.</div>'; return; }
+
+    body.innerHTML = "";
+    msgs.forEach(m => {
+      const isUser = m.role === "user";
+      const div    = document.createElement("div");
+      div.className = `chat-msg ${isUser ? "user" : "ai"}`;
+      div.innerHTML = `
+        <div class="chat-bubble">${escHtml(m.content)}</div>
+        <div class="chat-time">${isUser ? "Siswa" : "MindPal AI"} · ${(m.timestamp||"").slice(0,16).replace("T"," ")}</div>`;
+      body.appendChild(div);
+    });
+    body.scrollTop = body.scrollHeight;
+  }
+
+  // ── BARU: Generate ringkasan AI per sesi ─────────────────────────────
+  async function generateSummary(sessionId, msgCount, btn) {
+    if (msgCount === 0) return;
+
+    const box     = document.getElementById(`summary-${sessionId}`);
+    const textEl  = document.getElementById(`summary-text-${sessionId}`);
+
+    btn.disabled    = true;
+    btn.textContent = "⏳ Membuat...";
+    textEl.textContent = "";
+    box.classList.add("show");
+    textEl.textContent  = "Sedang menganalisis percakapan...";
+
+    try {
+      const res  = await fetch(`/admin/student/${STUDENT_ID}/session/${sessionId}/summarize`, {
+        method: "POST"
+      });
+      const data = await res.json();
+
+      if (data.summary) {
+        textEl.textContent = data.summary;
+        btn.textContent    = "✅ Diperbarui";
+      } else {
+        textEl.textContent = "Gagal membuat ringkasan. Coba lagi.";
+        btn.disabled       = false;
+        btn.textContent    = "✨ Ringkasan";
+      }
+    } catch {
+      textEl.textContent = "Koneksi bermasalah. Coba lagi.";
+      btn.disabled       = false;
+      btn.textContent    = "✨ Ringkasan";
+    }
+  }
+
+  async function saveNote() {
+    const note   = document.getElementById("noteInput").value.trim();
+    const status = document.getElementById("noteStatus");
+    if (!note) { status.className="note-status note-err"; status.textContent="Catatan kosong."; return; }
+
+    const res  = await fetch(`/admin/student/${STUDENT_ID}/note`, {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({note})
+    });
+    const data = await res.json();
+    if (data.success) {
+      status.className = "note-status note-ok";
+      status.textContent = "✅ Tersimpan!";
+      document.getElementById("noteInput").value = "";
+      const list   = document.getElementById("notesList");
+      const empty  = list.querySelector(".note-empty");
+      if (empty) empty.remove();
+      const now    = new Date().toISOString().slice(0,16).replace("T"," ");
+      const el     = document.createElement("div");
+      el.className = "note-item";
+      el.innerHTML = `${escHtml(note)}<div class="note-date">${now} · {{ admin_name }}</div>`;
+      list.prepend(el);
+      setTimeout(() => { status.textContent = ""; }, 3000);
+    } else {
+      status.className = "note-status note-err";
+      status.textContent = "❌ Gagal.";
+    }
+  }
+
+  async function doReset() {
+    document.getElementById("btnConfirmReset").disabled = true;
+    const res  = await fetch(`/admin/student/${STUDENT_ID}/reset-password`, {method:"POST"});
+    const data = await res.json();
+    const el   = document.getElementById("resetResult");
+    el.style.display = "block";
+    if (data.success) {
+      el.textContent = `✅ Password baru: ${data.password_baru}`;
+    } else {
+      el.style.background = "rgba(248,113,113,0.08)";
+      el.style.color = "#F87171";
+      el.textContent = "❌ " + (data.error || "Gagal reset.");
+    }
+    document.getElementById("btnConfirmReset").disabled = false;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br/>");
+  }
+
+  document.getElementById("chatModal").addEventListener("click", e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove("open"); });
+  document.getElementById("modalReset").addEventListener("click", e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove("open"); });
+</script>
+</body>
+</html>
