@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python -c 'from app import init_db; init_db()' && gunicorn app:app --workers 2 --bind 0.0.0.0:$PORT --timeout 120"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

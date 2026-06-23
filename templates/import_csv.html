@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MindPal — Import Data Siswa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --teal:#2DD4BF;--teal-dark:#0D9488;
+      --navy:#0F172A;--navy-mid:#1E293B;--navy-light:#334155;
+      --slate:#64748B;--white:#F8FAFC;--muted:#94A3B8;
+      --green:#4ADE80;--yellow:#FCD34D;--red:#F87171;
+    }
+    html,body{min-height:100%;font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);}
+
+    /* Top bar */
+    .top-bar{padding:14px 28px;background:var(--navy-mid);border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:14px;}
+    .logo-row{display:flex;align-items:center;gap:8px;text-decoration:none;}
+    .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+    .logo-text{font-family:'Sora',sans-serif;font-weight:700;font-size:1rem;color:var(--white);}
+    .logo-text span{color:var(--teal);}
+    .breadcrumb{font-size:0.82rem;color:var(--muted);display:flex;align-items:center;gap:6px;}
+    .breadcrumb a{color:var(--muted);text-decoration:none;}
+    .breadcrumb a:hover{color:var(--teal);}
+    .breadcrumb .sep{color:var(--slate);}
+    .top-actions{margin-left:auto;display:flex;gap:10px;}
+    .btn-back{padding:7px 14px;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.1);border-radius:9px;text-decoration:none;font-size:0.82rem;transition:all .2s;}
+    .btn-back:hover{background:rgba(255,255,255,0.1);color:var(--white);}
+
+    /* Content */
+    .content{max-width:780px;margin:36px auto;padding:0 24px 60px;}
+
+    .page-title{font-family:'Sora',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:6px;}
+    .page-sub{font-size:0.85rem;color:var(--muted);margin-bottom:28px;}
+
+    /* Card */
+    .card{background:var(--navy-mid);border:1px solid rgba(255,255,255,0.07);border-radius:18px;overflow:hidden;margin-bottom:20px;}
+    .card-head{padding:16px 22px;border-bottom:1px solid rgba(255,255,255,0.06);font-family:'Sora',sans-serif;font-size:0.92rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+    .card-body{padding:22px;}
+
+    /* Format info */
+    .format-table{width:100%;border-collapse:collapse;font-size:0.84rem;margin-top:10px;}
+    .format-table th{background:rgba(45,212,191,0.08);padding:9px 14px;text-align:left;font-weight:600;color:var(--teal);border-bottom:1px solid rgba(45,212,191,0.15);}
+    .format-table td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--muted);}
+    .format-table tr:last-child td{border-bottom:none;}
+
+    .code-block{background:var(--navy);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;font-family:monospace;font-size:0.83rem;color:#A5F3FC;margin-top:12px;line-height:1.8;}
+
+    .pwd-example{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .pwd-pill{background:rgba(45,212,191,0.07);border:1px solid rgba(45,212,191,0.15);border-radius:10px;padding:10px 14px;font-size:0.82rem;}
+    .pwd-pill .kls{color:var(--muted);margin-bottom:3px;}
+    .pwd-pill .pwd{color:var(--teal);font-family:monospace;font-weight:600;}
+
+    /* Upload zone */
+    .upload-zone{border:2px dashed rgba(45,212,191,0.3);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+    .upload-zone:hover,.upload-zone.drag-over{border-color:var(--teal);background:rgba(45,212,191,0.05);}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+    .upload-icon{font-size:36px;margin-bottom:10px;}
+    .upload-label{font-size:0.9rem;font-weight:500;margin-bottom:4px;}
+    .upload-hint{font-size:0.78rem;color:var(--muted);}
+    .file-chosen{font-size:0.82rem;color:var(--teal);margin-top:8px;min-height:18px;}
+
+    .btn-import{width:100%;margin-top:14px;padding:13px;background:linear-gradient(135deg,var(--teal),var(--teal-dark));color:var(--navy);font-family:'Sora',sans-serif;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:pointer;transition:opacity .2s,transform .15s;}
+    .btn-import:hover{opacity:.88;transform:translateY(-1px);}
+    .btn-import:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+    /* Progress */
+    .progress-wrap{display:none;margin-top:16px;}
+    .progress-bar-bg{height:6px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:6px;width:0%;transition:width .4s;}
+    .progress-label{font-size:0.78rem;color:var(--muted);margin-top:6px;text-align:center;}
+
+    /* Result */
+    .result-box{display:none;margin-top:16px;border-radius:12px;padding:16px 18px;}
+    .result-box.ok {background:rgba(74,222,128,0.08);border:1px solid rgba(74,222,128,0.2);}
+    .result-box.err{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);}
+    .result-summary{font-size:0.9rem;font-weight:600;margin-bottom:10px;}
+    .result-summary.ok {color:var(--green);}
+    .result-summary.err{color:var(--red);}
+    .result-list{max-height:180px;overflow-y:auto;font-size:0.79rem;color:var(--muted);line-height:1.9;}
+    .result-list::-webkit-scrollbar{width:4px;}
+    .result-list::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:4px;}
+
+    /* Angkatan badge */
+    .angkatan-badge{padding:3px 10px;background:rgba(45,212,191,0.1);color:var(--teal);border:1px solid rgba(45,212,191,0.2);border-radius:20px;font-size:0.75rem;font-weight:600;margin-left:8px;}
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="/admin" class="logo-row">
+    <div class="logo-icon">🧠</div>
+    <div class="logo-text">Mind<span>Pal</span></div>
+  </a>
+  <div class="breadcrumb">
+    <span class="sep">›</span>
+    <a href="/admin">Dashboard</a>
+    <span class="sep">›</span>
+    <span>Import Data Siswa</span>
+  </div>
+  <div class="top-actions">
+    <a href="/admin" class="btn-back">← Kembali</a>
+  </div>
+</div>
+
+<div class="content">
+  <div class="page-title">
+    📥 Import Data Siswa
+    {% if angkatan %}
+    <span class="angkatan-badge">Angkatan {{ angkatan }}</span>
+    {% else %}
+    <span class="angkatan-badge">Semua Angkatan</span>
+    {% endif %}
+  </div>
+  <p class="page-sub">Upload file CSV berisi data siswa. Password akan dibuat otomatis berdasarkan kelas masing-masing siswa.</p>
+
+  <!-- Format CSV -->
+  <div class="card">
+    <div class="card-head">📋 Format File CSV</div>
+    <div class="card-body">
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px;">File CSV harus memiliki header berikut di baris pertama:</p>
+      <table class="format-table">
+        <thead><tr><th>Kolom</th><th>Keterangan</th><th>Contoh</th></tr></thead>
+        <tbody>
+          <tr><td><code>nama</code></td><td>Nama lengkap siswa</td><td>Budi Santoso</td></tr>
+          <tr><td><code>nisn</code></td><td>NISN (10 digit) — digunakan sebagai username login</td><td>0123456789</td></tr>
+          <tr><td><code>kelas</code></td><td>Kelas siswa (angkatan Roman + spasi + huruf)</td><td>IX F</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">nama,nisn,kelas<br>
+Budi Santoso,0123456789,IX F<br>
+Sari Dewi,0987654321,VII B<br>
+Ahmad Fauzi,0112233445,VIII A</div>
+
+      <p style="font-size:0.82rem;color:var(--muted);margin-top:14px;margin-bottom:6px;">🔑 <strong style="color:var(--white)">Password otomatis per kelas:</strong></p>
+      <div class="pwd-example">
+        <div class="pwd-pill"><div class="kls">Kelas VII A</div><div class="pwd">mindpal7a</div></div>
+        <div class="pwd-pill"><div class="kls">Kelas VII I</div><div class="pwd">mindpal7i</div></div>
+        <div class="pwd-pill"><div class="kls">Kelas VIII B</div><div class="pwd">mindpal8b</div></div>
+        <div class="pwd-pill"><div class="kls">Kelas VIII F</div><div class="pwd">mindpal8f</div></div>
+        <div class="pwd-pill"><div class="kls">Kelas IX C</div><div class="pwd">mindpal9c</div></div>
+        <div class="pwd-pill"><div class="kls">Kelas IX I</div><div class="pwd">mindpal9i</div></div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:12px;">💡 Siswa bisa login dengan: <strong style="color:var(--white)">NISN</strong> sebagai username dan <strong style="color:var(--white)">password sesuai kelasnya</strong> di atas.</p>
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-head">⬆️ Upload File CSV</div>
+    <div class="card-body">
+      <div class="upload-zone" id="dropZone">
+        <input type="file" id="csvFile" accept=".csv"/>
+        <div class="upload-icon">📄</div>
+        <div class="upload-label">Klik atau drag & drop file CSV di sini</div>
+        <div class="upload-hint">Format: .csv · Encoding: UTF-8 atau UTF-8 BOM (Excel default)</div>
+        <div class="file-chosen" id="fileChosen"></div>
+      </div>
+
+      <button class="btn-import" id="btnImport" onclick="doImport()" disabled>
+        Import Data Siswa →
+      </button>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Mengupload dan memproses...</div>
+      </div>
+
+      <div class="result-box" id="resultBox">
+        <div class="result-summary" id="resultSummary"></div>
+        <div class="result-list"  id="resultList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const fileInput  = document.getElementById("csvFile");
+  const btnImport  = document.getElementById("btnImport");
+  const fileChosen = document.getElementById("fileChosen");
+  const dropZone   = document.getElementById("dropZone");
+
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) {
+      fileChosen.textContent = "✅ " + fileInput.files[0].name;
+      btnImport.disabled = false;
+    }
+  });
+
+  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.classList.remove("drag-over");
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith(".csv")) {
+      fileInput.files = e.dataTransfer.files;
+      fileChosen.textContent = "✅ " + file.name;
+      btnImport.disabled = false;
+    } else {
+      fileChosen.textContent = "❌ Hanya file CSV yang diterima.";
+    }
+  });
+
+  async function doImport() {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    btnImport.disabled = true;
+    document.getElementById("progressWrap").style.display = "block";
+    document.getElementById("resultBox").style.display    = "none";
+
+    // Animasi progress (simulasi — server side processing)
+    let prog = 0;
+    const fill  = document.getElementById("progressFill");
+    const label = document.getElementById("progressLabel");
+    const timer = setInterval(() => {
+      prog = Math.min(prog + Math.random() * 15, 85);
+      fill.style.width = prog + "%";
+    }, 300);
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      const res  = await fetch("/admin/import-csv", { method: "POST", body: fd });
+      const data = await res.json();
+
+      clearInterval(timer);
+      fill.style.width = "100%";
+      label.textContent = "Selesai!";
+
+      const box  = document.getElementById("resultBox");
+      const summ = document.getElementById("resultSummary");
+      const list = document.getElementById("resultList");
+
+      box.style.display = "block";
+      const hasError = data.gagal?.length > 0;
+      box.className  = "result-box " + (data.sukses > 0 ? "ok" : "err");
+      summ.className = "result-summary " + (data.sukses > 0 ? "ok" : "err");
+      summ.textContent = data.pesan || "Proses selesai.";
+
+      let listHtml = "";
+      if (data.duplikat?.length) {
+        listHtml += data.duplikat.map(d => `⚠️ ${d}`).join("<br>");
+      }
+      if (data.gagal?.length) {
+        listHtml += (listHtml ? "<br>" : "") + data.gagal.map(g => `❌ ${g}`).join("<br>");
+      }
+      list.innerHTML = listHtml || "";
+
+    } catch (err) {
+      clearInterval(timer);
+      const box  = document.getElementById("resultBox");
+      box.style.display = "block";
+      box.className = "result-box err";
+      document.getElementById("resultSummary").textContent = "❌ Gagal menghubungi server.";
+      document.getElementById("resultSummary").className   = "result-summary err";
+    }
+
+    btnImport.disabled = false;
+  }
+</script>
+</body>
+</html>
