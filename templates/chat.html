@@ -354,8 +354,14 @@
         transform: translateX(-100%);
         transition: transform 0.28s cubic-bezier(0.22,1,0.36,1);
         z-index: 50;
+        display: flex;
+        flex-direction: column;
       }
       .sidebar.open { transform: translateX(0); }
+
+      /* Buat session-list bisa scroll, footer tetap terlihat */
+      .session-list { flex: 1; overflow-y: auto; min-height: 0; }
+      .sidebar-footer { flex-shrink: 0; }
 
       .main { width: 100%; height: 100vh; }
 
