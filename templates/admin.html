@@ -47,6 +47,7 @@
     .main::-webkit-scrollbar-thumb{background:var(--navy-light);border-radius:4px;}
 
     .top-bar{padding:18px 28px;background:var(--navy-mid);border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .top-bar-left{display:flex;align-items:center;gap:10px;}
     .top-bar h1{font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:600;}
     .top-bar .date{font-size:0.8rem;color:var(--muted);}
     .top-actions{display:flex;gap:8px;}
@@ -188,16 +189,22 @@
         transform:translateX(-100%);
         transition:transform 0.28s cubic-bezier(0.22,1,0.36,1);
         z-index:50;
+        display:flex;flex-direction:column;
       }
       .sidebar.open{transform:translateX(0);}
+      .sb-nav{flex:1;overflow-y:auto;}
+      .sb-footer{flex-shrink:0;}
 
       .main{width:100%;height:auto;overflow:visible;}
       .menu-toggle{display:flex;align-items:center;}
 
-      .top-bar{padding:12px 14px;flex-wrap:wrap;gap:10px;}
-      .top-bar h1{font-size:0.97rem;}
-      .top-actions{flex-wrap:wrap;gap:6px;}
-      .btn-action{font-size:0.78rem;padding:7px 10px;}
+      /* Top-bar: hamburger+judul di kiri, tombol di kanan */
+      .top-bar{padding:10px 12px;gap:8px;}
+      .top-bar-left{flex:1;min-width:0;gap:8px;}
+      .top-bar h1{font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+      .top-bar .date{display:none;}
+      .top-actions{flex-shrink:0;gap:5px;}
+      .btn-action{font-size:0.74rem;padding:6px 9px;}
 
       .content{padding:14px;}
 
@@ -267,12 +274,14 @@
 <!-- MAIN -->
 <div class="main">
   <div class="top-bar">
-    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Buka menu">☰</button>
-    <div>
-      <h1>
-        {% if role == 'superadmin' %}Dashboard Super Admin{% else %}Dashboard Guru BK — Kelas {{ angkatan }}{% endif %}
-      </h1>
-      <div class="date">SMPN 16 Kota Pontianak · MindPal v2.0</div>
+    <div class="top-bar-left">
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Buka menu">☰</button>
+      <div>
+        <h1>
+          {% if role == 'superadmin' %}Dashboard Super Admin{% else %}Dashboard Guru BK — Kelas {{ angkatan }}{% endif %}
+        </h1>
+        <div class="date">SMPN 16 Kota Pontianak · MindPal v2.0</div>
+      </div>
     </div>
     <div class="top-actions">
       <a href="/admin/import-csv"><button class="btn-action btn-secondary">📥 Import CSV</button></a>
