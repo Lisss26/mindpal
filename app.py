@@ -18,7 +18,7 @@ FITUR v2.0:
 """
 
 from flask import (Flask, render_template, request,
-                   redirect, url_for, session, jsonify, Response)
+                   redirect, url_for, session, jsonify, Response, send_file)
 from werkzeug.security import generate_password_hash, check_password_hash
 from groq import Groq
 import sqlite3, os, csv, io, time, textwrap
@@ -936,6 +936,19 @@ Langsung tulis paragraf ringkasannya saja, tanpa judul atau label tambahan."""
     except Exception as e:
         print(f"❌ Groq summarize error: {e}")
         return jsonify({"error": "Gagal menghubungi AI. Coba lagi."}), 500
+
+
+# ─────────────────────────────────────────
+# ROUTE SEMENTARA: DOWNLOAD DATABASE MENTAH
+# ⚠️ HAPUS ROUTE INI SETELAH SELESAI DIPAKAI!
+# ─────────────────────────────────────────
+@app.route("/admin/emergency-download-db/<secret>")
+@superadmin_required
+def emergency_download_db(secret):
+    # Lapisan pengaman tambahan: token rahasia di URL
+    if secret != "OYcGiJSK8o1Xe-xPR7WbtA":
+        return "Akses ditolak.", 403
+    return send_file(DATABASE, as_attachment=True, download_name="mindpal_backup.db")
 
 
 # ─────────────────────────────────────────
